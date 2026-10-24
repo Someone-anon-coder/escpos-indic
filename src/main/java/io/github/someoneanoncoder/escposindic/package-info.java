@@ -10,5 +10,5 @@
  * Reuse:     Keep in sync with FOLDER.md.
  * Plan:      L3
  */
-/** ESC/POS command builder, paper widths and bit images. */
+/** ESC/POS command builder and paper widths. */
 package io.github.someoneanoncoder.escposindic;
