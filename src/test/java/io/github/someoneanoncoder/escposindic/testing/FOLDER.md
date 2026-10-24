@@ -7,6 +7,7 @@
 ## Contents
 | File | Purpose | Plan |
 |---|---|---|
+| TestFonts.java | Loads the test-only Devanagari font | L3-02 |
 | Hex.java | Hex text to bytes and back | L3-01 |
 | UnitTest.java, PropertyTest.java, GoldenTest.java, ArchTest.java, SecurityTest.java | JUnit 5 tag meta-annotations | L3 |
 

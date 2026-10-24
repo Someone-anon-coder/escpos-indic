@@ -4,9 +4,9 @@
  * Layer:     api
  * Purpose:   Builds an ESC/POS byte stream from typed commands.
  * Owns:      Command encoding, parameter range checks, the printable-ASCII rule for native text.
- * Uses:      Alignment, CutMode, DrawerPin.
- * Used by:   Callers that print receipts; the line layout (L3-03) and BitImage output (L3-02).
- * Not here:  Raster text, barcodes, sending bytes (transport package), receipt templates.
+ * Uses:      Alignment, CutMode, DrawerPin, BitImage.
+ * Used by:   Callers that print receipts; the line layout (L3-03).
+ * Not here:  Drawing raster text and barcodes, sending bytes (transport package), receipt templates.
  * Reuse:     Own implementation; no dependency on another ESC/POS library.
  * Plan:      L3-01
  */
@@ -39,6 +39,7 @@ public final class EscPosBuilder {
   private static final int MAX_BYTE = 255;
   private static final int MAX_SIZE = 8;
   private static final int MAX_DRAWER_MILLIS = 510;
+  private static final int MAX_BAND_ROWS = 255;
 
   private final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -197,6 +198,29 @@ public final class EscPosBuilder {
    */
   public EscPosBuilder drawerKick(DrawerPin pin) {
     return drawerKick(pin, 100, 100);
+  }
+
+  /**
+   * Prints a raster bit image, command {@code GS v 0 m xL xH yL yH d1...dk} with {@code m = 0}
+   * (normal density). The image is sent in bands of at most {@value #MAX_BAND_ROWS} rows, each its
+   * own command, so printers with a small receive buffer or a row limit per command still print it;
+   * rows are contiguous because raster rows are not separated by line spacing.
+   *
+   * <p>Epson marks {@code GS v 0} as obsolete in favour of {@code GS ( L}, but it is the command
+   * all common receipt printers implement, including 58 mm models.
+   *
+   * @param image the image, not null; its width should not exceed the paper width
+   * @return this builder
+   */
+  public EscPosBuilder image(BitImage image) {
+    Objects.requireNonNull(image, "image");
+    int rowBytes = image.rowBytes();
+    for (int top = 0; top < image.height(); top += MAX_BAND_ROWS) {
+      int rows = Math.min(MAX_BAND_ROWS, image.height() - top);
+      bytes(GS, 'v', '0', 0, rowBytes & 0xFF, rowBytes >> 8, rows & 0xFF, rows >> 8);
+      out.writeBytes(image.rowsToBytes(top, top + rows));
+    }
+    return this;
   }
 
   /**
