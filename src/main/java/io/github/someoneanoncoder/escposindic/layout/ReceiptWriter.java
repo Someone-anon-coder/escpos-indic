@@ -145,6 +145,19 @@ public final class ReceiptWriter {
   }
 
   /**
+   * Prints an image such as a QR code or barcode, placed on the paper by the current alignment.
+   *
+   * @param image the image, not null, at most as wide as the paper
+   * @return this writer
+   * @throws IllegalArgumentException if the image is wider than the paper
+   */
+  public ReceiptWriter image(BitImage image) {
+    Objects.requireNonNull(image, "image");
+    commands.image(image.padded(paper.dots(), alignment));
+    return this;
+  }
+
+  /**
    * Prints a line made of one repeated character across the full width, for example a dashed rule.
    *
    * @param fill a printable ASCII character

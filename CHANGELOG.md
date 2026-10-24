@@ -5,6 +5,7 @@ All notable changes are listed here. Format: [Keep a Changelog](https://keepacha
 ## [Unreleased]
 
 ### Added
+- `BarcodeRaster` (QR with whole-dot modules and quiet zone, Code 128, EAN-13 as `BitImage`), `QrLevel`, `BitImage.generate` and `padded`, `ReceiptWriter.image`; ZXing core 3.5.4 is the only runtime dependency; QR codes of ASCII content are written without an ECI header, because ZXing's own reader could not decode some larger ones that had it (found by a property test, readable by OpenCV) [L3-04].
 - `ReceiptWriter` and `Column`: native text for ASCII, raster for everything else, column rows, rules; `TextRasteriser.withFallback` for per-character font choice (Latin + Devanagari) [L3-03].
 - `BitImage`, `EscPosBuilder.image` (`GS v 0` in bands of 255 rows) and `TextRasteriser` (Java2D shaped Devanagari to 1-bit at 384/576 dots, wrapping, alignment, thresholding) [L3-02].
 - `EscPosBuilder`: initialise, align, bold, underline, size, feed, line spacing, cut, drawer kick and printable-ASCII text; `PaperWidth`, `Alignment`, `CutMode`, `DrawerPin` [L3-01].

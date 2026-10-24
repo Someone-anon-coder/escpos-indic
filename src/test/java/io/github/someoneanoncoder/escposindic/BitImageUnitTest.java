@@ -175,4 +175,29 @@ class BitImageUnitTest {
     assertThat(a).isNotEqualTo(BitImage.of(7, 1, new byte[] {0}));
     assertThat(a).isNotEqualTo("x");
   }
+
+  @Test
+  @DisplayName("generate asks for every dot, x then y")
+  void shouldGenerate_whenSourceGiven() {
+    BitImage img = BitImage.generate(10, 3, (x, y) -> x == y * 4 + 1);
+    assertThat(img.isBlack(1, 0)).isTrue();
+    assertThat(img.isBlack(5, 1)).isTrue();
+    assertThat(img.isBlack(9, 2)).isTrue();
+    assertThat(img.isBlack(0, 0)).isFalse();
+    assertThat(img.toBytes()).containsExactly(0x40, 0x00, 0x04, 0x00, 0x00, 0x40);
+  }
+
+  @Test
+  @DisplayName("padded puts the image left, centre or right on a wider white strip")
+  void shouldPad_whenTargetIsWider() {
+    BitImage dot = BitImage.of(1, 1, new byte[] {(byte) 0x80});
+    assertThat(dot.padded(9, Alignment.LEFT).isBlack(0, 0)).isTrue();
+    assertThat(dot.padded(9, Alignment.CENTER).isBlack(4, 0)).isTrue();
+    assertThat(dot.padded(10, Alignment.CENTER).isBlack(4, 0)).isTrue();
+    assertThat(dot.padded(9, Alignment.RIGHT).isBlack(8, 0)).isTrue();
+    assertThat(dot.padded(9, Alignment.RIGHT).width()).isEqualTo(9);
+    assertThat(dot.padded(1, Alignment.RIGHT)).isSameAs(dot);
+    assertThatThrownBy(() -> BitImage.of(8, 1, new byte[1]).padded(7, Alignment.LEFT))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
 }

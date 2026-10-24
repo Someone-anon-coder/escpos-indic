@@ -15,6 +15,7 @@
 | package-info.java | Package documentation | L3 |
 
 ## Sub-folders
+- barcode/ — QR, Code 128, EAN-13 images
 - layout/ — receipt lines and column rows (native ASCII or raster)
 - raster/ — text to 1-bit image with Java2D
 - internal/ — non-exported implementations (when needed)

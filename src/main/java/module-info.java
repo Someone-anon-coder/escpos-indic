@@ -12,8 +12,11 @@
  */
 
 /** ESC/POS thermal printing with rasterised Hindi/Marathi text, QR codes and barcodes. */
+@SuppressWarnings(
+    "requires-automatic") // ZXing core ships no module descriptor; it is an automatic module.
 module io.github.someoneanoncoder.escposindic {
   requires java.desktop;
+  requires com.google.zxing;
 
 // Exports are added with the first public types (L3-01).
 }
