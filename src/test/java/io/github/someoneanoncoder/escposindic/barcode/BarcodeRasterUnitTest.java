@@ -127,4 +127,15 @@ class BarcodeRasterUnitTest {
     }
     assertThat(img.isBlack(img.width() / 2, 0)).isEqualTo(img.isBlack(img.width() / 2, 39));
   }
+
+  @Test
+  @DisplayName(
+      "a long content that once failed a block-based decoder decodes: 150 characters, level M")
+  void shouldDecode_whenContentIsLongAndModulesAreBig() {
+    String content =
+        "vzSnyu6OcfNDgDknBpxJsTK6oQL1okMNfZVtQSpwTcKSBHf0or3zh30jggka7fnQd2TEuRjEKWcJdgSrZanVXfDygMwLfsIzuSqhZzyiLtfctMrSSDzznNC6QsqCQbmggxsrNHHDx1TSXFFR6ehJoDp1";
+    BitImage img = BarcodeRaster.qr(content, QrLevel.M, 576);
+    assertThat(img.width()).isEqualTo(570); // 57 modules of 10 dots, no ECI header
+    assertThat(BarcodeDecoder.decode(img).text()).isEqualTo(content);
+  }
 }

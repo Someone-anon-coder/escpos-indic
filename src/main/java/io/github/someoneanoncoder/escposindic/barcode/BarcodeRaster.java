@@ -73,7 +73,11 @@ public final class BarcodeRaster {
     Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
     hints.put(EncodeHintType.ERROR_CORRECTION, level.zxing());
     hints.put(EncodeHintType.MARGIN, QR_QUIET_ZONE);
-    hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+    if (!isAscii(content)) {
+      // The hint makes ZXing add an ECI header, which costs modules and which some scanners handle
+      // poorly. Plain ASCII, such as every UPI link, is therefore written without it.
+      hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+    }
     BitMatrix matrix =
         encode(() -> new QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, 0, 0, hints));
     int modules = matrix.getWidth();
@@ -144,6 +148,15 @@ public final class BarcodeRaster {
     int lastRow = matrix.getHeight() - 1;
     return BitImage.generate(
         width, heightDots, (x, y) -> matrix.get(x / scaleX, Math.min(y / scaleY, lastRow)));
+  }
+
+  private static boolean isAscii(String text) {
+    for (int i = 0; i < text.length(); i++) {
+      if (text.charAt(i) > 0x7F) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private static void requireLength(String text, int max, String what) {
