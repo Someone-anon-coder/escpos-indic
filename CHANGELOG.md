@@ -4,6 +4,8 @@ All notable changes are listed here. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-24
+
 ### Added
 - Golden tests: hand-written bytes for every command, approved sample receipts at 58 and 80 mm with readable listings, approved PNGs for Hindi rasters and barcodes [L3-06].
 - `Transport` with `PrintQueueTransport` (javax.print raw bytes), `TcpTransport` (port 9100, connect and write deadlines) and `FileSinkTransport` (no links, no directories) [L3-05].
