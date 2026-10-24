@@ -34,12 +34,12 @@ class EscPosIndicArchTest {
           .importPackages(ROOT);
 
   @Test
-  @DisplayName("library depends on the JDK and ZXing only")
+  @DisplayName("library depends on the JDK (java.*, javax.print) and ZXing only")
   void shouldDependOnJdkOnly_whenAnalysingMainClasses() {
     classes()
         .should()
         .onlyDependOnClassesThat()
-        .resideInAnyPackage(ROOT + "..", "java..", "com.google.zxing..")
+        .resideInAnyPackage(ROOT + "..", "java..", "javax.print..", "com.google.zxing..")
         .check(MAIN);
   }
 
