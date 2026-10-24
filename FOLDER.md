@@ -12,4 +12,5 @@
 | gradle | Version catalog and wrapper |
 | .github/workflows | CI (ubuntu + windows) and release |
 | jitpack.yml | JitPack build with JDK 25 |
+| README.md | Purpose, install, examples (run by a test), sources, 'Not verified' list |
 | CLAUDE.md | Conventions for this repo (derived from the ShopSuite §12 template) |
