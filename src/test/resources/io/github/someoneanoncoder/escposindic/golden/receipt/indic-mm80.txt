@@ -1,0 +1,22 @@
+INITIALIZE
+ALIGN 1
+IMAGE bytesPerRow=72 rows=52 blackDots=1710
+IMAGE bytesPerRow=72 rows=34 blackDots=1257
+ALIGN 0
+LINE "------------------------------------------------"
+IMAGE bytesPerRow=72 rows=34 blackDots=1730
+LINE "------------------------------------------------"
+IMAGE bytesPerRow=72 rows=32 blackDots=881
+LINE "------------------------------------------------"
+IMAGE bytesPerRow=72 rows=34 blackDots=1744
+IMAGE bytesPerRow=72 rows=34 blackDots=1774
+IMAGE bytesPerRow=72 rows=34 blackDots=1558
+LINE "------------------------------------------------"
+IMAGE bytesPerRow=72 rows=32 blackDots=762
+ALIGN 1
+IMAGE bytesPerRow=72 rows=34 blackDots=1367
+IMAGE bytesPerRow=72 rows=255 blackDots=40662
+IMAGE bytesPerRow=72 rows=186 blackDots=26163
+IMAGE bytesPerRow=72 rows=34 blackDots=1154
+FEED_LINES 2
+CUT m=66 n=0
