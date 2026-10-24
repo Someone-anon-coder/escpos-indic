@@ -160,4 +160,35 @@ class TextRasteriserUnitTest {
   void shouldRefuse_whenMeasuringTwoLines() {
     assertThatThrownBy(() -> r58.measure("क\nख")).isInstanceOf(IllegalArgumentException.class);
   }
+
+  @Test
+  @DisplayName("a fallback font draws characters the first font lacks")
+  void shouldUseFallback_whenFirstFontLacksCharacter() {
+    TextRasteriser mixed =
+        TextRasteriser.of(TestFonts.devanagari(24f), PaperWidth.MM58)
+            .withFallback(TestFonts.latin(22f));
+    assertThat(blackCount(mixed.rasterise("Total कुल", Alignment.LEFT))).isPositive();
+    assertThat(mixed.measure("Total")).isGreaterThan(40);
+    assertThatThrownBy(() -> r58.rasterise("Total", Alignment.LEFT))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  @DisplayName("fonts are tried in the order they were added")
+  void shouldPreferFirstFont_whenBothCanDisplay() {
+    TextRasteriser latinFirst =
+        TextRasteriser.of(TestFonts.latin(22f), PaperWidth.MM58)
+            .withFallback(TestFonts.devanagari(24f));
+    TextRasteriser devaFirst =
+        TextRasteriser.of(TestFonts.devanagari(24f), PaperWidth.MM58)
+            .withFallback(TestFonts.latin(22f));
+    assertThat(latinFirst.measure("1250")).isNotEqualTo(devaFirst.measure("1250"));
+  }
+
+  @Test
+  @DisplayName("zero width joiner is accepted and follows the previous font")
+  void shouldAcceptJoiner_whenTextHasZeroWidthJoiner() {
+    assertThat(blackCount(r58.rasterise("क्\u200Dष", Alignment.LEFT))).isPositive();
+    assertThat(blackCount(r58.rasterise("क्\u200Cष", Alignment.LEFT))).isPositive();
+  }
 }
