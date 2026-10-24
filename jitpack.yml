@@ -1,0 +1,11 @@
+# JitPack builds with an old default JDK; install Temurin 25 through SDKMAN first.
+# Identifier from: curl https://api.sdkman.io/2/candidates/java/linuxx64/versions/list?current=
+before_install:
+  - curl -s "https://get.sdkman.io" | bash
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
+  - sdk install java 25.0.4.1+1-tem
+  - sdk use java 25.0.4.1+1-tem
+install:
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
+  - sdk use java 25.0.4.1+1-tem
+  - ./gradlew -x test -x pitest publishToMavenLocal
