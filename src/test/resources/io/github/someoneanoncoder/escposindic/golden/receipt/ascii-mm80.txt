@@ -23,8 +23,8 @@ LINE "TOTAL                                   1,593.00"
 BOLD 0
 ALIGN 1
 LINE "Scan to pay"
-IMAGE bytesPerRow=72 rows=255 blackDots=41742
-IMAGE bytesPerRow=72 rows=186 blackDots=27189
+IMAGE bytesPerRow=72 rows=255 blackDots=40662
+IMAGE bytesPerRow=72 rows=186 blackDots=26163
 IMAGE bytesPerRow=72 rows=50 blackDots=9200
 LINE "A/26-27/000001"
 IMAGE bytesPerRow=72 rows=50 blackDots=4900
