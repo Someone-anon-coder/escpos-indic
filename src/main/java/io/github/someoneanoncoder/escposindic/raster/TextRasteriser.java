@@ -37,9 +37,10 @@ import java.util.Objects;
  *
  * <p>The library bundles no font. The caller supplies a {@link Font} at the wanted pixel size, for
  * example {@code Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(24f)}; one pixel is one
- * printer dot. About 24 dots gives readable text on 203 dpi receipt printers. The font must contain
- * every character of the text, otherwise {@link #rasterise(String, int, Alignment)} refuses it
- * instead of printing empty boxes.
+ * printer dot. About 24 dots gives readable text on 203 dpi receipt printers. Fallback fonts can be
+ * added with {@link #withFallback(Font)}. Every character must be displayable by one of the fonts,
+ * otherwise {@link #rasterise(String, int, Alignment)} refuses the text instead of printing empty
+ * boxes. The zero width joiner and non-joiner are always accepted, they only steer shaping.
  *
  * <p>Text is limited to {@value #MAX_CHARACTERS} characters and the image to {@value
  * BitImage#MAX_HEIGHT} rows. Only the line feed is accepted as a control character and it starts a
@@ -53,14 +54,16 @@ public final class TextRasteriser {
   /** Brightness threshold used unless another is given. */
   public static final int DEFAULT_THRESHOLD = 160;
 
+  private static final int ZWNJ = 0x200C;
+  private static final int ZWJ = 0x200D;
   private static final FontRenderContext CONTEXT = new FontRenderContext(null, true, true);
 
-  private final Font font;
+  private final List<Font> fonts;
   private final PaperWidth paper;
   private final int threshold;
 
-  private TextRasteriser(Font font, PaperWidth paper, int threshold) {
-    this.font = font;
+  private TextRasteriser(List<Font> fonts, PaperWidth paper, int threshold) {
+    this.fonts = fonts;
     this.paper = paper;
     this.threshold = threshold;
   }
@@ -74,9 +77,24 @@ public final class TextRasteriser {
    */
   public static TextRasteriser of(Font font, PaperWidth paper) {
     return new TextRasteriser(
-        Objects.requireNonNull(font, "font"),
+        List.of(Objects.requireNonNull(font, "font")),
         Objects.requireNonNull(paper, "paper"),
         DEFAULT_THRESHOLD);
+  }
+
+  /**
+   * Returns a copy with one more font to try. Every character is drawn with the first font, in the
+   * order they were added, that can display it. Use this to combine a Latin font and a Devanagari
+   * font, because most Indic fonts have no Latin letters. Give the fonts the same pixel size so the
+   * lines look even.
+   *
+   * @param fallback the next font to try, not null
+   * @return the new rasteriser
+   */
+  public TextRasteriser withFallback(Font fallback) {
+    List<Font> all = new ArrayList<>(fonts);
+    all.add(Objects.requireNonNull(fallback, "fallback"));
+    return new TextRasteriser(List.copyOf(all), paper, threshold);
   }
 
   /**
@@ -91,7 +109,7 @@ public final class TextRasteriser {
     if (newThreshold < 1 || newThreshold > 255) {
       throw new IllegalArgumentException("threshold must be 1 to 255 but was " + newThreshold);
     }
-    return new TextRasteriser(font, paper, newThreshold);
+    return new TextRasteriser(fonts, paper, newThreshold);
   }
 
   /**
@@ -149,7 +167,7 @@ public final class TextRasteriser {
     if (text.indexOf('\n') >= 0) {
       throw new IllegalArgumentException("measure takes a single line");
     }
-    return (int) Math.ceil(new TextLayout(text, font, CONTEXT).getAdvance());
+    return (int) Math.ceil(new TextLayout(styled(text).getIterator(), CONTEXT).getAdvance());
   }
 
   private void checkText(String text) {
@@ -163,22 +181,51 @@ public final class TextRasteriser {
         throw new IllegalArgumentException("control character at index " + i);
       }
     }
-    int bad = font.canDisplayUpTo(text);
-    if (bad >= 0) {
-      throw new IllegalArgumentException("the font cannot display the character at index " + bad);
+    int index = 0;
+    while (index < text.length()) {
+      int codePoint = text.codePointAt(index);
+      if (fontFor(codePoint, null) == null) {
+        throw new IllegalArgumentException("no font can display the character at index " + index);
+      }
+      index += Character.charCount(codePoint);
     }
+  }
+
+  private Font fontFor(int codePoint, Font previous) {
+    if (previous != null && (codePoint == ZWNJ || codePoint == ZWJ)) {
+      return previous;
+    }
+    for (Font candidate : fonts) {
+      if (candidate.canDisplay(codePoint)) {
+        return candidate;
+      }
+    }
+    return null;
+  }
+
+  private AttributedString styled(String paragraph) {
+    AttributedString attributed = new AttributedString(paragraph);
+    Font previous = fonts.get(0);
+    int index = 0;
+    while (index < paragraph.length()) {
+      int codePoint = paragraph.codePointAt(index);
+      Font chosen = fontFor(codePoint, previous);
+      int next = index + Character.charCount(codePoint);
+      attributed.addAttribute(TextAttribute.FONT, chosen, index, next);
+      previous = chosen;
+      index = next;
+    }
+    return attributed;
   }
 
   private List<TextLayout> layoutLines(String text, int widthDots) {
     List<TextLayout> lines = new ArrayList<>();
     for (String paragraph : text.split("\n", -1)) {
       if (paragraph.isEmpty()) {
-        lines.add(new TextLayout(" ", font, CONTEXT));
+        lines.add(new TextLayout(" ", fonts.get(0), CONTEXT));
         continue;
       }
-      AttributedString attributed = new AttributedString(paragraph);
-      attributed.addAttribute(TextAttribute.FONT, font);
-      AttributedCharacterIterator iterator = attributed.getIterator();
+      AttributedCharacterIterator iterator = styled(paragraph).getIterator();
       LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, CONTEXT);
       while (measurer.getPosition() < iterator.getEndIndex()) {
         lines.add(measurer.nextLayout(widthDots));

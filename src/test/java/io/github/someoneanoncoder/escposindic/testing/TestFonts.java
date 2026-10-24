@@ -24,7 +24,20 @@ public final class TestFonts {
   private static final String DEVANAGARI =
       "/io/github/someoneanoncoder/escposindic/fonts/NotoSansDevanagari-Regular.ttf";
 
+  private static final String LATIN =
+      "/io/github/someoneanoncoder/escposindic/fonts/NotoSans-Regular.ttf";
+
   private TestFonts() {}
+
+  /**
+   * Loads the Latin font (digits, letters, rupee sign) at a size.
+   *
+   * @param size pixel size, one pixel is one printer dot
+   * @return the font
+   */
+  public static Font latin(float size) {
+    return load(LATIN, size);
+  }
 
   /**
    * Loads the Devanagari font at a size.
@@ -33,7 +46,11 @@ public final class TestFonts {
    * @return the font
    */
   public static Font devanagari(float size) {
-    try (InputStream in = TestFonts.class.getResourceAsStream(DEVANAGARI)) {
+    return load(DEVANAGARI, size);
+  }
+
+  private static Font load(String resource, float size) {
+    try (InputStream in = TestFonts.class.getResourceAsStream(resource)) {
       return Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(in)).deriveFont(size);
     } catch (java.awt.FontFormatException e) {
       throw new IllegalStateException(e);
