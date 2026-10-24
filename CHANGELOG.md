@@ -4,6 +4,11 @@ All notable changes are listed here. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-25
+
+### Fixed
+- The JPMS descriptor exported no packages, so a module-path consumer could not use the library at all (`package ... is not visible`); the five public packages are now exported and `java.desktop` is `requires transitive` because `BufferedImage` and `Font` are part of the API. `0.1.0` has this defect: use `0.1.1`. A new test reads the compiled descriptor and fails if the export list changes [L3].
+
 ## [0.1.0] - 2026-10-24
 
 ### Added
