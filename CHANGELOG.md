@@ -5,4 +5,5 @@ All notable changes are listed here. Format: [Keep a Changelog](https://keepacha
 ## [Unreleased]
 
 ### Added
+- `EscPosBuilder`: initialise, align, bold, underline, size, feed, line spacing, cut, drawer kick and printable-ASCII text; `PaperWidth`, `Alignment`, `CutMode`, `DrawerPin` [L3-01].
 - Project scaffold: Gradle, JPMS descriptor, Spotless, Checkstyle, JaCoCo, PIT, CI on ubuntu and windows, release workflow [L3].
