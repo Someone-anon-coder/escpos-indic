@@ -21,6 +21,7 @@ import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 import io.github.someoneanoncoder.escposindic.BitImage;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,7 +65,9 @@ public final class BarcodeDecoder {
                       DecodeHintType.CHARACTER_SET,
                       "UTF-8",
                       DecodeHintType.PURE_BARCODE,
-                      Boolean.TRUE));
+                      Boolean.TRUE,
+                      DecodeHintType.POSSIBLE_FORMATS,
+                      List.of(expected)));
       return new Decoded(result.getText(), result.getBarcodeFormat().name());
     } catch (NotFoundException e) {
       throw new AssertionError("no barcode found in " + image, e);

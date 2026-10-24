@@ -147,4 +147,19 @@ class BarcodeRasterUnitTest {
     assertThat(img.width()).isEqualTo(570); // 57 modules of 10 dots, no ECI header
     assertThat(BarcodeDecoder.decode(img, BarcodeFormat.QR_CODE).text()).isEqualTo(content);
   }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "Sl83nbxvaNbWHGSQRtPOYc9sxG857XMQGVn",
+        "4IPMOKfYSDfZTAaObekMZAN",
+        "Y0ayjBpDocCv9HQQDgft"
+      })
+  @DisplayName("regression: Code 128 data that ZXing also reads as UPC-A or EAN-8 round-trips")
+  void shouldDecodeCode128_whenAnotherFormatHidesInTheBars(String data) {
+    BitImage img = BarcodeRaster.code128(data, 3, 40);
+    BarcodeDecoder.Decoded decoded = BarcodeDecoder.decode(img, BarcodeFormat.CODE_128);
+    assertThat(decoded.text()).isEqualTo(data);
+    assertThat(decoded.format()).isEqualTo("CODE_128");
+  }
 }
