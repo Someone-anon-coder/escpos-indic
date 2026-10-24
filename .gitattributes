@@ -12,3 +12,4 @@ gradlew text eol=lf
 *.txt text eol=lf
 *.png binary
 *.ttf binary
+*.bin binary
