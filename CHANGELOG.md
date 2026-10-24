@@ -4,6 +4,9 @@ All notable changes are listed here. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+### Fixed
+- Test decoder now names the expected barcode format: ZXing sometimes read a UPC-A or EAN-8 out of valid Code 128 bars (3 of 20,000 random codes); the library output was correct. Seen once on the Windows CI run of `main`.
+
 ## [0.1.0] - 2026-10-24
 
 ### Added
