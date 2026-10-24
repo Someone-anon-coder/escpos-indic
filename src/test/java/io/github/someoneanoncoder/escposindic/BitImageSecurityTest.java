@@ -41,6 +41,21 @@ class BitImageSecurityTest {
   }
 
   @Test
+  @DisplayName("generate and fromImage check sizes too")
+  void shouldRefuse_whenGeneratedOrConvertedSizeOutOfRange() {
+    assertThatThrownBy(() -> BitImage.generate(0, 1, (x, y) -> true))
+        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> BitImage.generate(1, BitImage.MAX_HEIGHT + 1, (x, y) -> true))
+        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(
+            () ->
+                BitImage.fromImage(
+                    new BufferedImage(BitImage.MAX_WIDTH + 1, 1, BufferedImage.TYPE_BYTE_BINARY),
+                    128))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
   @DisplayName("packed data of the wrong length is refused")
   void shouldRefuse_whenPackedLengthIsWrong() {
     assertThatThrownBy(() -> BitImage.of(8, 2, new byte[1]))

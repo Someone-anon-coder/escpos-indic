@@ -200,4 +200,26 @@ class ReceiptWriterUnitTest {
     assertThatThrownBy(() -> new Column(1, Alignment.LEFT, null))
         .isInstanceOf(NullPointerException.class);
   }
+
+  @Test
+  @DisplayName("an image is padded to the paper width by the current alignment")
+  void shouldPadImage_whenImageWritten() {
+    io.github.someoneanoncoder.escposindic.BitImage dot =
+        io.github.someoneanoncoder.escposindic.BitImage.of(8, 1, new byte[] {(byte) 0xFF});
+    byte[] left = ReceiptWriter.asciiOnly(PaperWidth.MM58).image(dot).build();
+    assertThat(Hex.text(java.util.Arrays.copyOf(left, 8))).isEqualTo("1D 76 30 00 30 00 01 00");
+    assertThat(left[8]).isEqualTo((byte) 0xFF);
+    byte[] right =
+        ReceiptWriter.asciiOnly(PaperWidth.MM58).align(Alignment.RIGHT).image(dot).build();
+    assertThat(right[3 + 8 + 47]).isEqualTo((byte) 0xFF);
+    byte[] centre =
+        ReceiptWriter.asciiOnly(PaperWidth.MM58).align(Alignment.CENTER).image(dot).build();
+    assertThat(centre[3 + 8 + 23]).isEqualTo((byte) 0x0F);
+    assertThat(centre[3 + 8 + 24]).isEqualTo((byte) 0xF0);
+    assertThatThrownBy(
+            () ->
+                ReceiptWriter.asciiOnly(PaperWidth.MM58)
+                    .image(io.github.someoneanoncoder.escposindic.BitImage.blank(385, 1)))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
 }

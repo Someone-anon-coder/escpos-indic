@@ -91,6 +91,43 @@ public final class BitImage {
     return new BitImage(width, height, copy);
   }
 
+  /** Tells which dots of a generated image are black. */
+  @FunctionalInterface
+  public interface DotSource {
+    /**
+     * Tells whether one dot is black.
+     *
+     * @param x column, 0 to width - 1
+     * @param y row, 0 to height - 1
+     * @return true for black
+     */
+    boolean isBlack(int x, int y);
+  }
+
+  /**
+   * Creates an image by asking a function for every dot.
+   *
+   * @param width width in dots, 1 to {@value #MAX_WIDTH}
+   * @param height height in dots, 1 to {@value #MAX_HEIGHT}
+   * @param source tells which dots are black, not null
+   * @return the image
+   * @throws IllegalArgumentException if a size is out of range
+   */
+  public static BitImage generate(int width, int height, DotSource source) {
+    Objects.requireNonNull(source, "source");
+    checkSize(width, height);
+    int rowBytes = rowBytes(width);
+    byte[] bits = new byte[rowBytes * height];
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        if (source.isBlack(x, y)) {
+          bits[y * rowBytes + (x >> 3)] |= (byte) (0x80 >> (x & 7));
+        }
+      }
+    }
+    return new BitImage(width, height, bits);
+  }
+
   /**
    * Converts a Java2D image to black and white. A dot is black when its brightness, after blending
    * with white by its alpha, is below the threshold.
@@ -172,6 +209,37 @@ public final class BitImage {
       yOffset += part.height;
     }
     return result;
+  }
+
+  /**
+   * Returns the image placed on a white strip of a given width, so that it sits left, centred or
+   * right on the paper regardless of the printer's justification setting.
+   *
+   * @param targetWidth width of the strip in dots; at least the image width, at most {@value
+   *     #MAX_WIDTH}
+   * @param alignment where the image sits, not null
+   * @return a new image {@code targetWidth} wide, or this image if it already has that width
+   * @throws IllegalArgumentException if the image is wider than {@code targetWidth}
+   */
+  public BitImage padded(int targetWidth, Alignment alignment) {
+    Objects.requireNonNull(alignment, "alignment");
+    if (targetWidth < width) {
+      throw new IllegalArgumentException(
+          "image is " + width + " dots wide but the target is " + targetWidth);
+    }
+    if (targetWidth == width) {
+      return this;
+    }
+    int slack = targetWidth - width;
+    int offset =
+        switch (alignment) {
+          case LEFT -> 0;
+          case CENTER -> slack / 2;
+          case RIGHT -> slack;
+        };
+    BitImage strip = blank(targetWidth, height);
+    strip.copyFrom(this, offset, 0);
+    return strip;
   }
 
   /**
