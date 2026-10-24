@@ -14,6 +14,7 @@ package io.github.someoneanoncoder.escposindic.barcode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.zxing.BarcodeFormat;
 import io.github.someoneanoncoder.escposindic.testing.BarcodeDecoder;
 import io.github.someoneanoncoder.escposindic.testing.PropertyTest;
 import net.jqwik.api.ForAll;
@@ -33,7 +34,9 @@ class BarcodeRasterPropertyTest {
           @StringLength(min = 1, max = 200)
           String content,
       @ForAll QrLevel level) {
-    assertThat(BarcodeDecoder.decode(BarcodeRaster.qr(content, level, 576)).text())
+    assertThat(
+            BarcodeDecoder.decode(BarcodeRaster.qr(content, level, 576), BarcodeFormat.QR_CODE)
+                .text())
         .isEqualTo(content);
   }
 
@@ -42,7 +45,9 @@ class BarcodeRasterPropertyTest {
       @ForAll @net.jqwik.api.constraints.AlphaChars @NumericChars @StringLength(min = 1, max = 40)
           String data,
       @ForAll @IntRange(min = 2, max = 3) int module) {
-    assertThat(BarcodeDecoder.decode(BarcodeRaster.code128(data, module, 40)).text())
+    assertThat(
+            BarcodeDecoder.decode(BarcodeRaster.code128(data, module, 40), BarcodeFormat.CODE_128)
+                .text())
         .isEqualTo(data);
   }
 
@@ -51,7 +56,8 @@ class BarcodeRasterPropertyTest {
       @ForAll @NumericChars @StringLength(11) String rest) {
     // A leading 0 is reported by ZXing as UPC-A (12 digits), so start with 5.
     String digits = "5" + rest;
-    String decoded = BarcodeDecoder.decode(BarcodeRaster.ean13(digits, 2, 50)).text();
+    String decoded =
+        BarcodeDecoder.decode(BarcodeRaster.ean13(digits, 2, 50), BarcodeFormat.EAN_13).text();
     assertThat(decoded).startsWith(digits).hasSize(13);
     int sum = 0;
     for (int i = 0; i < 12; i++) {

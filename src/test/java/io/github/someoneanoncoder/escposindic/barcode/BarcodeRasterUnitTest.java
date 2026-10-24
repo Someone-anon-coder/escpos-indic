@@ -14,6 +14,7 @@ package io.github.someoneanoncoder.escposindic.barcode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.zxing.BarcodeFormat;
 import io.github.someoneanoncoder.escposindic.BitImage;
 import io.github.someoneanoncoder.escposindic.testing.BarcodeDecoder;
 import io.github.someoneanoncoder.escposindic.testing.UnitTest;
@@ -35,7 +36,7 @@ class BarcodeRasterUnitTest {
   void shouldDecodeUpiLink_whenQrFitsPaper(int paperDots) {
     BitImage img = BarcodeRaster.qr(UPI, QrLevel.M, paperDots);
     assertThat(img.width()).isEqualTo(img.height()).isLessThanOrEqualTo(paperDots);
-    BarcodeDecoder.Decoded decoded = BarcodeDecoder.decode(img);
+    BarcodeDecoder.Decoded decoded = BarcodeDecoder.decode(img, BarcodeFormat.QR_CODE);
     assertThat(decoded.text()).isEqualTo(UPI);
     assertThat(decoded.format()).isEqualTo("QR_CODE");
   }
@@ -44,7 +45,9 @@ class BarcodeRasterUnitTest {
   @EnumSource(QrLevel.class)
   @DisplayName("every error correction level decodes")
   void shouldDecode_whenAnyLevel(QrLevel level) {
-    assertThat(BarcodeDecoder.decode(BarcodeRaster.qr("ABC-123", level, 384)).text())
+    assertThat(
+            BarcodeDecoder.decode(BarcodeRaster.qr("ABC-123", level, 384), BarcodeFormat.QR_CODE)
+                .text())
         .isEqualTo("ABC-123");
   }
 
@@ -77,7 +80,10 @@ class BarcodeRasterUnitTest {
   @Test
   @DisplayName("Hindi text in a QR survives as UTF-8")
   void shouldDecodeHindi_whenQrHasUtf8() {
-    assertThat(BarcodeDecoder.decode(BarcodeRaster.qr("धन्यवाद", QrLevel.M, 384)).text())
+    assertThat(
+            BarcodeDecoder.decode(
+                    BarcodeRaster.qr("धन्यवाद", QrLevel.M, 384), BarcodeFormat.QR_CODE)
+                .text())
         .isEqualTo("धन्यवाद");
   }
 
@@ -87,7 +93,7 @@ class BarcodeRasterUnitTest {
   void shouldDecodeCode128_whenModuleWidthVaries(int module) {
     BitImage img = BarcodeRaster.code128("A/26-27/000001", module, 60);
     assertThat(img.height()).isEqualTo(60);
-    BarcodeDecoder.Decoded decoded = BarcodeDecoder.decode(img);
+    BarcodeDecoder.Decoded decoded = BarcodeDecoder.decode(img, BarcodeFormat.CODE_128);
     assertThat(decoded.text()).isEqualTo("A/26-27/000001");
     assertThat(decoded.format()).isEqualTo("CODE_128");
   }
@@ -104,7 +110,7 @@ class BarcodeRasterUnitTest {
   @DisplayName("a 12 digit EAN-13 gets its check digit: 590123412345 becomes 5901234123457")
   void shouldAddCheckDigit_whenTwelveDigits() {
     BarcodeDecoder.Decoded decoded =
-        BarcodeDecoder.decode(BarcodeRaster.ean13("590123412345", 2, 80));
+        BarcodeDecoder.decode(BarcodeRaster.ean13("590123412345", 2, 80), BarcodeFormat.EAN_13);
     assertThat(decoded.text()).isEqualTo("5901234123457");
     assertThat(decoded.format()).isEqualTo("EAN_13");
   }
@@ -112,7 +118,10 @@ class BarcodeRasterUnitTest {
   @Test
   @DisplayName("a 13 digit EAN-13 with a right check digit is accepted")
   void shouldAccept_whenThirteenDigitsWithRightCheck() {
-    assertThat(BarcodeDecoder.decode(BarcodeRaster.ean13("8901030865275", 3, 100)).text())
+    assertThat(
+            BarcodeDecoder.decode(
+                    BarcodeRaster.ean13("8901030865275", 3, 100), BarcodeFormat.EAN_13)
+                .text())
         .isEqualTo("8901030865275");
   }
 
@@ -136,6 +145,6 @@ class BarcodeRasterUnitTest {
         "vzSnyu6OcfNDgDknBpxJsTK6oQL1okMNfZVtQSpwTcKSBHf0or3zh30jggka7fnQd2TEuRjEKWcJdgSrZanVXfDygMwLfsIzuSqhZzyiLtfctMrSSDzznNC6QsqCQbmggxsrNHHDx1TSXFFR6ehJoDp1";
     BitImage img = BarcodeRaster.qr(content, QrLevel.M, 576);
     assertThat(img.width()).isEqualTo(570); // 57 modules of 10 dots, no ECI header
-    assertThat(BarcodeDecoder.decode(img).text()).isEqualTo(content);
+    assertThat(BarcodeDecoder.decode(img, BarcodeFormat.QR_CODE).text()).isEqualTo(content);
   }
 }
