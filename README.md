@@ -2,7 +2,7 @@
 
 ESC/POS thermal receipt printing for Java 25, built for Indian shops: Hindi and Marathi text is shaped by Java2D and printed as a raster image, plain ASCII stays fast native text, and UPI QR codes and barcodes are drawn as images. Works with 58 mm (384 dots) and 80 mm (576 dots) printers over a Windows print queue, TCP port 9100, or into a file for tests.
 
-Status: `0.1.0` candidate. **Not yet verified on a real printer** (see [Not verified](#not-verified)). MIT licence.
+Status: `0.1.1` (`0.1.0` exported no packages to module-path users; use `0.1.1`). **Not yet verified on a real printer** (see [Not verified](#not-verified)). MIT licence.
 
 - Java 25, JPMS module `io.github.someoneanoncoder.escposindic`.
 - One runtime dependency: [ZXing core](https://github.com/zxing/zxing) (Apache-2.0), for QR and barcode matrices.
@@ -14,7 +14,7 @@ JitPack (first release):
 
 ```kotlin
 repositories { maven("https://jitpack.io") }
-dependencies { implementation("com.github.Someone-anon-coder:escpos-indic:v0.1.0") }
+dependencies { implementation("com.github.Someone-anon-coder:escpos-indic:v0.1.1") }
 ```
 
 Maven Central coordinates `io.github.someone-anon-coder:escpos-indic` follow before v1.0.0.

@@ -15,8 +15,12 @@
 @SuppressWarnings(
     "requires-automatic") // ZXing core ships no module descriptor; it is an automatic module.
 module io.github.someoneanoncoder.escposindic {
-  requires java.desktop;
+  requires transitive java.desktop; // BufferedImage and Font appear in the public API
   requires com.google.zxing;
 
-// Exports are added with the first public types (L3-01).
+  exports io.github.someoneanoncoder.escposindic;
+  exports io.github.someoneanoncoder.escposindic.barcode;
+  exports io.github.someoneanoncoder.escposindic.layout;
+  exports io.github.someoneanoncoder.escposindic.raster;
+  exports io.github.someoneanoncoder.escposindic.transport;
 }
