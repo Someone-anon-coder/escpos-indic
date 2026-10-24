@@ -4,9 +4,6 @@ All notable changes are listed here. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
-### Fixed
-- Test decoder now names the expected barcode format: ZXing sometimes read a UPC-A or EAN-8 out of valid Code 128 bars (3 of 20,000 random codes); the library output was correct. Seen once on the Windows CI run of `main`.
-
 ## [0.1.0] - 2026-10-24
 
 ### Added
@@ -17,3 +14,6 @@ All notable changes are listed here. Format: [Keep a Changelog](https://keepacha
 - `BitImage`, `EscPosBuilder.image` (`GS v 0` in bands of 255 rows) and `TextRasteriser` (Java2D shaped Devanagari to 1-bit at 384/576 dots, wrapping, alignment, thresholding) [L3-02].
 - `EscPosBuilder`: initialise, align, bold, underline, size, feed, line spacing, cut, drawer kick and printable-ASCII text; `PaperWidth`, `Alignment`, `CutMode`, `DrawerPin` [L3-01].
 - Project scaffold: Gradle, JPMS descriptor, Spotless, Checkstyle, JaCoCo, PIT, CI on ubuntu and windows, release workflow [L3].
+
+### Fixed
+- Test decoder now names the expected barcode format: ZXing sometimes read a UPC-A or EAN-8 out of valid Code 128 bars (3 of 20,000 random codes); the library output was correct. Seen once on the Windows CI run of `main`.
