@@ -1,0 +1,19 @@
+# Build output
+build/
+.gradle/
+out/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.claude/
+
+# Secrets and local data (CLAUDE.md §3.9)
+*.db
+*.db-wal
+*.db-shm
+local.properties
+*.key
+*.pem
+.jqwik-database
