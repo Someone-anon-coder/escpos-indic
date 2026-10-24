@@ -22,7 +22,14 @@ import com.google.zxing.common.HybridBinarizer;
 import io.github.someoneanoncoder.escposindic.BitImage;
 import java.util.Map;
 
-/** Decodes the barcode in a {@link BitImage}. */
+/**
+ * Decodes the barcode in a {@link BitImage}.
+ *
+ * <p>The images are clean synthetic pictures, so ZXing's pure-barcode mode is used. Without it
+ * ZXing's detector fails on about 1 in 100 random QR codes (checked on 3,000 inputs: both
+ * binarisers fail on the same ones) although OpenCV decodes every one of them; with it 6,000 of
+ * 6,000 decode. Real scanners work on camera pictures and are not affected by this choice.
+ */
 public final class BarcodeDecoder {
 
   private BarcodeDecoder() {}
@@ -45,7 +52,14 @@ public final class BarcodeDecoder {
             new HybridBinarizer(new RGBLuminanceSource(image.width(), image.height(), pixels)));
     try {
       Result result =
-          new MultiFormatReader().decode(bitmap, Map.of(DecodeHintType.CHARACTER_SET, "UTF-8"));
+          new MultiFormatReader()
+              .decode(
+                  bitmap,
+                  Map.of(
+                      DecodeHintType.CHARACTER_SET,
+                      "UTF-8",
+                      DecodeHintType.PURE_BARCODE,
+                      Boolean.TRUE));
       return new Decoded(result.getText(), result.getBarcodeFormat().name());
     } catch (NotFoundException e) {
       throw new AssertionError("no barcode found in " + image, e);
